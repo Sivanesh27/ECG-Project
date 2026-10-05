@@ -27,7 +27,6 @@ class Config(BaseSettings):
     rate_limit_upload_per_min: int = 10
     dev_print_reset_links: bool = True             # prints password-reset links to the server console (no SMTP yet)
     frontend_url: str = "http://localhost:5173"
-    cookie_domain: str = ""
 
     @property
     def origins(self) -> list[str]:

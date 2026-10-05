@@ -69,14 +69,11 @@ class S3Storage(StorageService):     # S3 / Cloudflare R2 / MinIO (any S3-compat
         import boto3                  # optional dependency: pip install boto3
         c = get_config()
         self.bucket = c.s3_bucket
-        from botocore.config import Config
         self.s3 = boto3.client("s3", endpoint_url=c.s3_endpoint_url or None, region_name=c.s3_region,
-                               aws_access_key_id=c.s3_access_key, aws_secret_access_key=c.s3_secret_key,
-                               config=Config(request_checksum_calculation="when_required", response_checksum_validation="when_required"))
-        self._sse = {} if c.s3_endpoint_url else {"ServerSideEncryption": "AES256"} 
+                               aws_access_key_id=c.s3_access_key, aws_secret_access_key=c.s3_secret_key)
 
     def put(self, key, data):
-        self.s3.put_object(Bucket=self.bucket, Key=_check(key), Body=data, **self._sse)
+        self.s3.put_object(Bucket=self.bucket, Key=_check(key), Body=data, ServerSideEncryption="AES256")
 
     def get(self, key):
         return self.s3.get_object(Bucket=self.bucket, Key=_check(key))["Body"].read()

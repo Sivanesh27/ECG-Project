@@ -22,7 +22,7 @@ def _public(u: dict) -> dict:
 def _set_cookies(resp: Response, user: dict, remember: bool):
     c = get_config()
     tok, ttl = make_token(user["_id"], user.get("tokenVersion", 0), remember)
-    kw = dict(secure=c.cookie_secure, samesite=c.cookie_samesite, path="/", domain=c.cookie_domain or None)
+    kw = dict(secure=c.cookie_secure, samesite=c.cookie_samesite, path="/")
     resp.set_cookie(SESSION_COOKIE, tok, httponly=True, max_age=ttl if remember else None, **kw)
     resp.set_cookie(CSRF_COOKIE, new_csrf(), httponly=False, max_age=ttl if remember else None, **kw)
 
@@ -59,8 +59,7 @@ async def login(body: LoginIn, request: Request, response: Response):
 
 @router.post("/logout")
 async def logout(response: Response):
-    d = get_config().cookie_domain or None
-    response.delete_cookie(SESSION_COOKIE, path="/", domain=d); response.delete_cookie(CSRF_COOKIE, path="/", domain=d)
+    response.delete_cookie(SESSION_COOKIE, path="/"); response.delete_cookie(CSRF_COOKIE, path="/")
     return {"ok": True}
 
 
@@ -103,6 +102,5 @@ async def delete_account(body: DeleteAccountIn, response: Response, user: dict =
     if not verify_password(body.password, user["password_hash"]):
         raise HTTPException(403, "Password incorrect")
     await delete_user_everything(user["_id"])
-    d = get_config().cookie_domain or None
-    response.delete_cookie(SESSION_COOKIE, path="/", domain=d); response.delete_cookie(CSRF_COOKIE, path="/", domain=d)
+    response.delete_cookie(SESSION_COOKIE, path="/"); response.delete_cookie(CSRF_COOKIE, path="/")
     return {"ok": True}

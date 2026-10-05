@@ -1,6 +1,6 @@
 import type { AppSettings, Analysis, Dashboard, EcgWindow, HrSeries, Job, RR, SessionRow, UploadResult, User } from '../types'
 
-const BASE = `${import.meta.env.VITE_API_BASE ?? ''}/api`
+const BASE = '/api'
 
 export class ApiError extends Error {
   status: number
