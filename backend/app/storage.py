@@ -96,6 +96,39 @@ class S3Storage(StorageService):     # S3 / Cloudflare R2 / MinIO (any S3-compat
             return False
 
 
+class MongoGridFSStorage(StorageService):
+    """Stores files inside MongoDB (GridFS) -- needs no extra service or card. Atlas free M0 has a 512 MB cap, so keep
+    uploads small (MAX_UPLOAD_MB) and delete sessions/uploads you no longer need."""
+    def __init__(self, uri: str, db_name: str):
+        import gridfs
+        from pymongo import MongoClient
+        self._fs = gridfs.GridFS(MongoClient(uri)[db_name], collection="files")
+
+    def put(self, key, data):
+        _check(key)
+        for f in self._fs.find({"filename": key}):
+            self._fs.delete(f._id)
+        self._fs.put(data, filename=key)
+
+    def get(self, key):
+        f = self._fs.find_one({"filename": _check(key)})
+        if f is None:
+            raise FileNotFoundError(key)
+        return f.read()
+
+    def delete(self, key):
+        for f in self._fs.find({"filename": _check(key)}):
+            self._fs.delete(f._id)
+
+    def delete_prefix(self, prefix):
+        import re
+        for f in self._fs.find({"filename": {"$regex": "^" + re.escape(_check(prefix.rstrip("/"))) + "/"}}):
+            self._fs.delete(f._id)
+
+    def exists(self, key):
+        return self._fs.find_one({"filename": _check(key)}) is not None
+
+
 _storage: StorageService | None = None
 
 
@@ -103,7 +136,12 @@ def get_storage() -> StorageService:
     global _storage
     if _storage is None:
         c = get_config()
-        _storage = S3Storage() if c.storage_backend == "s3" else LocalStorage(c.storage_dir)
+        if c.storage_backend == "s3":
+            _storage = S3Storage()
+        elif c.storage_backend == "mongo":
+            _storage = MongoGridFSStorage(c.mongodb_uri, c.mongodb_db)
+        else:
+            _storage = LocalStorage(c.storage_dir)
     return _storage
 
 

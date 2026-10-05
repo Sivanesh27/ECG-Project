@@ -15,7 +15,7 @@ class Config(BaseSettings):
     cookie_secure: bool = False                    # True in production (HTTPS)
     cookie_samesite: str = "lax"
     cors_origins: str = "http://localhost:5173"
-    storage_backend: str = "local"                 # local | s3
+    storage_backend: str = "local"                 # local | s3 | mongo (GridFS, no extra service)
     storage_dir: str = "../storage"
     s3_bucket: str = ""
     s3_endpoint_url: str = ""

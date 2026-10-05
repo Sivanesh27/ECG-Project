@@ -17,4 +17,3 @@ matplotlib>=3.8
 pytest==8.3.4
 httpx==0.28.1
 mongomock-motor==0.0.34
-boto3>=1.36
