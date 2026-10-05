@@ -1,0 +1,21 @@
+"""Auditable metric definitions (inputs, minimum data, method, units, limitations)."""
+METRICS = {
+ "mean_rr": dict(name="Mean RR", unit="ms", domain="time", requires=["NN intervals"], minimum_data=">= 2 NN", method="arithmetic mean of accepted NN"),
+ "sdnn": dict(name="SDNN", unit="ms", domain="time", requires=["NN intervals"], minimum_data=">= 30 NN; interpretation depends strongly on recording length (ultra-short < 5 min is a rough proxy only)", method="sample standard deviation (ddof=1) of NN", limitations="Not comparable between recordings of different length."),
+ "rmssd": dict(name="RMSSD", unit="ms", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 NN pairs", method="sqrt(mean((NN[i+1]-NN[i])^2)); pairs bridging rejected beats or gaps are excluded", limitations="Short-term beat-to-beat variability; sensitive to artifacts and to heart rate."),
+ "sdsd": dict(name="SDSD", unit="ms", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="sample std of successive differences"),
+ "nn50": dict(name="NN50", unit="count", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="# successive differences with |d| > 50 ms"),
+ "pnn50": dict(name="pNN50", unit="%", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="100 * NN50 / number of valid successive differences"),
+ "nn20": dict(name="NN20", unit="count", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="# successive differences with |d| > 20 ms"),
+ "pnn20": dict(name="pNN20", unit="%", domain="time", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="100 * NN20 / number of valid successive differences"),
+ "cvnn": dict(name="CVNN", unit="%", domain="time", requires=["NN intervals"], minimum_data=">= 30 NN", method="100 * SDNN / mean NN"),
+ "hrv_triangular_index": dict(name="HRV triangular index", unit="-", domain="time", requires=["NN intervals"], minimum_data=">= 200 NN", method="N / max histogram bin (bin width 1/128 s)"),
+ "tinn": dict(name="TINN", unit="ms", domain="time", requires=["NN intervals"], minimum_data=">= 200 NN", method="least-squares triangular interpolation of the NN histogram"),
+ "vlf": dict(name="VLF power", unit="ms²", domain="frequency", requires=["NN tachogram"], minimum_data=">= 300 s artifact-free", method="PSD (Welch on 4 Hz cubic-resampled, detrended tachogram; or Lomb-Scargle) integrated over 0.0033-0.04 Hz", limitations="Not reported for short recordings."),
+ "lf": dict(name="LF power", unit="ms²", domain="frequency", requires=["NN tachogram"], minimum_data=">= 120 s artifact-free", method="PSD integrated over 0.04-0.15 Hz", limitations="Reflects mixed influences (incl. baroreflex and respiration); not a pure sympathetic index."),
+ "hf": dict(name="HF power", unit="ms²", domain="frequency", requires=["NN tachogram"], minimum_data=">= 120 s artifact-free", method="PSD integrated over 0.15-0.40 Hz", limitations="Strongly affected by breathing rate and depth."),
+ "lf_hf": dict(name="LF/HF", unit="ratio", domain="frequency", requires=["LF", "HF"], minimum_data=">= 120 s", method="LF / HF", limitations="NOT a direct measure of sympathetic/parasympathetic balance."),
+ "total_power": dict(name="Total power", unit="ms²", domain="frequency", requires=["VLF", "LF", "HF"], minimum_data=">= 300 s", method="VLF + LF + HF"),
+ "sd1": dict(name="SD1", unit="ms", domain="nonlinear", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="std of (NN[i+1]-NN[i])/sqrt2"),
+ "sd2": dict(name="SD2", unit="ms", domain="nonlinear", requires=["adjacent NN pairs"], minimum_data=">= 30 pairs", method="std of (NN[i+1]+NN[i])/sqrt2"),
+}

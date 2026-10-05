@@ -1,0 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root { color-scheme: dark; }
+html, body, #root { height: 100%; }
+body { @apply bg-bg text-white font-sans antialiased; font-feature-settings: 'tnum' 1; }
+*:focus-visible { outline: 2px solid #FF7A18; outline-offset: 2px; }
+::selection { background: #FF6A00; color: #0B0B0B; }
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-thumb { background: #2A2A2A; }
+
+@layer components {
+  .panel { @apply bg-panel border border-line; }
+  .btn { @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold border transition-colors disabled:opacity-40 disabled:cursor-not-allowed; }
+  .btn-primary { @apply btn bg-orange text-ink border-orange hover:bg-orange-bright; }
+  .btn-ghost { @apply btn bg-transparent text-white border-line hover:border-orange hover:text-orange; }
+  .btn-danger { @apply btn bg-transparent text-red-300 border-red-900 hover:bg-red-950; }
+  .field { @apply w-full bg-ink border border-line px-3 py-2 text-sm text-white placeholder-neutral-600 focus:border-orange; }
+  .label { @apply block text-sm text-muted mb-1; }
+  .readout { @apply font-mono tabular-nums; }
+}
+
+/* the one deliberate motion: the hero ECG trace draws itself once */
+@keyframes trace { to { stroke-dashoffset: 0; } }
+.trace-draw { stroke-dasharray: 2400; stroke-dashoffset: 2400; animation: trace 3.2s cubic-bezier(.4,.1,.2,1) forwards; }
+@media (prefers-reduced-motion: reduce) { .trace-draw { animation: none; stroke-dashoffset: 0; } }

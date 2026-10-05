@@ -1,0 +1,31 @@
+# Whole stack:  docker compose up --build      ->  http://localhost:8080
+# Set JWT_SECRET in your shell or .env first:   export JWT_SECRET=$(python3 -c "import secrets;print(secrets.token_urlsafe(48))")
+services:
+  mongo:
+    image: mongo:7
+    restart: unless-stopped
+    volumes: [mongo_data:/data/db]
+    ports: ["127.0.0.1:27017:27017"]       # bound to localhost only
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    depends_on: [mongo]
+    environment:
+      ENV: production
+      MONGODB_URI: mongodb://mongo:27017
+      MONGODB_DB: ecg_hrv
+      JWT_SECRET: ${JWT_SECRET:?set JWT_SECRET (>= 32 chars)}
+      COOKIE_SECURE: "false"                # set "true" once served over HTTPS
+      CORS_ORIGINS: http://localhost:8080
+      FRONTEND_URL: http://localhost:8080
+      STORAGE_BACKEND: local
+      STORAGE_DIR: /data/storage
+    volumes: [storage_data:/data/storage]
+  frontend:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on: [backend]
+    ports: ["8080:80"]
+volumes:
+  mongo_data:
+  storage_data:
