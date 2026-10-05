@@ -157,10 +157,4 @@ Relations verified on the data and used as documented algorithms: `avg_hr`/`max_
 
 Argon2id password hashing · JWT in **httpOnly** cookie · CSRF (double-submit + Origin check) · CORS allow-list · rate limiting · strict input validation (Pydantic) · file-type/magic-byte/size checks · ZIP path-traversal and bomb protection · opaque UUID storage keys, files never served by URL · **every repository call is scoped by `userId` derived only from the cookie**; non-owned resources return 404 · NPZ loaded with `allow_pickle=False` · generic error messages, no bodies or tokens in logs · delete session / upload / account removes DB rows and stored files.
 
-## 7. Verification status (please read)
 
-Verified by running code against your real dataset: parser, ECG filter, R-peak detector, artifact handling, RR, HRV (time/frequency/Poincaré), zones, TRIMP, movement, full pipeline on all 57 sessions, PDF report. R-peak detection: **98.5 % sensitivity** against the device `is_pulse` flags; ECG-derived HR vs the device's independent HR series: **median error 1.8 %** (41 of 44 comparable segments within 10 %). The device's `is_pulse` flags undercount badly in some noisy/exercise segments, so they are a lower-bound reference, not ground truth.
-
-**Not executed in the build environment (no network → FastAPI, Motor and npm packages could not be installed):** the FastAPI app, MongoDB layer, API tests (`test_api.py`), and the React frontend (`npm run build` was not run). They were written carefully and syntax-checked, but expect to fix small issues on first run — please run `pytest` and `npm run build` and report any failure.
-
-Known limitations: HRV windows are short (ultra-short-term); LF/HF is not an autonomic-balance index; TRIMP is not the device's proprietary load; the in-process job runner and rate limiter suit a single instance.
